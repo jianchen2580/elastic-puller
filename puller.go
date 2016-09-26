@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
+	//"strconv"
+	//"os"
 	"reflect"
 
 	elastic "gopkg.in/olivere/elastic.v3"
@@ -21,10 +23,12 @@ type Puller struct {
 	ESClient  *elastic.Client
 	TimeStart string
 	TimeEnd   string
-	Session   string
+	SessionID string
+	AccountID string
+	AppID     string
 }
 
-func NewPuller(start string, end string) (*Puller, error) {
+func NewPuller(start string, end string, accountID string, sessionID string, appID string) (*Puller, error) {
 	client, err := elastic.NewClient()
 	if err != nil {
 		panic(err)
@@ -33,6 +37,9 @@ func NewPuller(start string, end string) (*Puller, error) {
 		ESClient:  client,
 		TimeStart: start,
 		TimeEnd:   end,
+		SessionID: sessionID,
+		AppID:     appID,
+		AccountID: accountID,
 	}
 	return p, nil
 }
@@ -41,11 +48,17 @@ func (p *Puller) Search() (*elastic.SearchResult, error) {
 	client := p.ESClient
 	query := elastic.NewBoolQuery()
 	query = query.Must(elastic.NewRangeQuery("@timestamp").
-		//Gte("2016-09-21T19:32:58.016Z").
-		//Lte("now/d"))
 		Gte(p.TimeStart).
 		Lte(p.TimeEnd))
-	query = query.Must(elastic.NewTermQuery("port", "35937"))
+	if len(p.AccountID) != 0 {
+		query = query.Must(elastic.NewTermQuery("account_id", p.AccountID))
+	}
+	if len(p.AppID) != 0 {
+		query = query.Must(elastic.NewTermQuery("app_id", p.AppID))
+	}
+	if len(p.SessionID) != 0 {
+		query = query.Must(elastic.NewTermQuery("session_number", p.SessionID))
+	}
 	// TODO: Print DSL, could remove in the future
 	src, err := query.Source()
 	data, err := json.Marshal(src)
@@ -55,12 +68,12 @@ func (p *Puller) Search() (*elastic.SearchResult, error) {
 	fmt.Println(string(data))
 
 	searchResult, err := client.Search().
-		Index("log").       // search in index "twitter"
-		Query(query).       // specify the query
-		Sort("date", true). // sort by "user" field, ascending
-		From(0).Size(10).   // take documents 0-9
-		Pretty(true).       // pretty print request and response JSON
-		Do()                // execute
+		Index("log").        // search in index "twitter"
+		Query(query).        // specify the query
+		Sort("date", true).  // sort by "user" field, ascending
+		From(0).Size(10000). // take documents 0-9
+		Pretty(true).        // pretty print request and response JSON
+		Do()                 // execute
 	if err != nil {
 		// Handle error
 		panic(err)
@@ -85,7 +98,7 @@ func (p *Puller) Search() (*elastic.SearchResult, error) {
 	return searchResult, nil
 }
 
-func (p *Puller) GenerateFile(sr *elastic.SearchResult) (*os.File, error) {
+func (p *Puller) GenerateFile(sr *elastic.SearchResult) (bytes.Buffer, error) {
 	tmpfile, err := ioutil.TempFile("", "example")
 	fmt.Println("filename is:", tmpfile.Name)
 	if err != nil {
@@ -93,16 +106,12 @@ func (p *Puller) GenerateFile(sr *elastic.SearchResult) (*os.File, error) {
 	}
 
 	var ttyp Log
+	var buffer bytes.Buffer
 	for _, item := range sr.Each(reflect.TypeOf(ttyp)) {
 		if t, ok := item.(Log); ok {
 			s := fmt.Sprintf("%s %s %s %s\n", t.Timestamp, t.Program, t.Host, t.Message)
-			if _, err := tmpfile.Write([]byte(s)); err != nil {
-				panic(err)
-			}
+			buffer.WriteString(s)
 		}
 	}
-	if err := tmpfile.Close(); err != nil {
-		panic(err)
-	}
-	return tmpfile, nil
+	return buffer, nil
 }

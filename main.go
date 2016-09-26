@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/gin-gonic/gin"
 	//"net/http"
 )
@@ -20,15 +20,17 @@ func index(c *gin.Context) {
 }
 
 func search(c *gin.Context) {
-	date_gte := c.Query("date_gte")
-	date_lte := c.Query("date_lte")
-	fmt.Println("###", date_gte, date_lte)
-	pull, err := NewPuller(date_gte, date_lte)
+	dateGte := c.Query("date_gte")
+	dateLte := c.Query("date_lte")
+	accountID := c.Query("account_id")
+	appID := c.Query("app_id")
+	sessionID := c.Query("session_id")
+	//fmt.Println("###", date_gte, date_lte)
+	pull, err := NewPuller(dateGte, dateLte, accountID, sessionID, appID)
 	if err != nil {
 		panic(err)
 	}
 	result, err := pull.Search()
-	file, err := pull.GenerateFile(result)
-	fmt.Println("############", file.Name)
-	c.File("/tmp/hello")
+	buffer, err := pull.GenerateFile(result)
+	c.String(200, buffer.String())
 }

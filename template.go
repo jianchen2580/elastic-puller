@@ -16,7 +16,9 @@ var html = template.Must(template.New("ES_Puller").Parse(`
     <form id="myForm" action="/search" method="get"> 
     Date Start: <input id="date_gte" name="date_gte" value=""></input> 
     Date End: <input id="date_lte" name="date_lte"></input> 
-    Session Number: <input id="session_number" name="session_number" value=""></input> 
+    Account ID: <input id="account_id" name="account_id" value=""></input> 
+    App ID: <input id="app_id" name="app_id" value=""></input> 
+    Session ID: <input id="session_id" name="session_id" value=""></input> 
     <input type="submit" value="Submit" /> 
     </form>
 </body>
