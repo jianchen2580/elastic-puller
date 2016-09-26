@@ -13,7 +13,7 @@ var html = template.Must(template.New("ES_Puller").Parse(`
     <body>
     <h1>Welcome to ES Puller</h1>
     <div id="messages"></div>
-    <form id="myForm" action="/search" method="post"> 
+    <form id="myForm" action="/search" method="get"> 
     Date Start: <input id="date_gte" name="date_gte" value=""></input> 
     Date End: <input id="date_lte" name="date_lte"></input> 
     Session Number: <input id="session_number" name="session_number" value=""></input> 

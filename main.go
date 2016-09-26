@@ -11,7 +11,7 @@ func main() {
 	r.SetHTMLTemplate(html)
 
 	r.GET("/index", index)
-	r.POST("/search", search)
+	r.GET("/search", search)
 	r.Run(":8080")
 }
 
@@ -20,8 +20,8 @@ func index(c *gin.Context) {
 }
 
 func search(c *gin.Context) {
-	date_gte := c.PostForm("date_gte")
-	date_lte := c.PostForm("date_lte")
+	date_gte := c.Query("date_gte")
+	date_lte := c.Query("date_lte")
 	fmt.Println("###", date_gte, date_lte)
 	pull, err := NewPuller(date_gte, date_lte)
 	if err != nil {
