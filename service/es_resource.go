@@ -6,11 +6,45 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"gopkg.in/olivere/elastic.v3"
 	//"net/http"
 	//"io/ioutil"
 )
 
 type ESResource struct {
+}
+
+type Log struct {
+	Timestamp string `json:"@timestamp"`
+	Program   string `json:"program"`
+	Host      string `json:"host"`
+	Message   string `json:"message"`
+}
+
+type Puller struct {
+	ESClient  *elastic.Client
+	index     string
+	TimeStart string
+	TimeEnd   string
+	SessionID string
+	AccountID string
+	AppID     string
+}
+
+func NewPuller(index string, start string, end string, accountID string, sessionID string, appID string) (*Puller, error) {
+	client, err := elastic.NewClient()
+	if err != nil {
+		panic(err)
+	}
+	p := &Puller{
+		ESClient:  client,
+		TimeStart: start,
+		TimeEnd:   end,
+		SessionID: sessionID,
+		AppID:     appID,
+		AccountID: accountID,
+	}
+	return p, nil
 }
 
 func (er *ESResource) index(c *gin.Context) {
