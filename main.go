@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/gin-gonic/gin"
+	//"github.com/gin-gonic/gin"
 	"github.com/jianchen2580/elastic-puller/service"
 
 	"github.com/codegangsta/cli"

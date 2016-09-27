@@ -1,9 +1,12 @@
 package service
 
 import (
+	"bytes"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"os"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
 	"gopkg.in/olivere/elastic.v3"
@@ -47,6 +50,67 @@ func NewPuller(index string, start string, end string, accountID string, session
 	return p, nil
 }
 
+func (p *Puller) Search() (*elastic.SearchResult, error) {
+	client := p.ESClient
+	query := elastic.NewBoolQuery()
+	query = query.Must(elastic.NewRangeQuery("@timestamp").
+		Gte(p.TimeStart).
+		Lte(p.TimeEnd))
+	if len(p.AccountID) != 0 {
+		query = query.Must(elastic.NewTermQuery("account_id", p.AccountID))
+	}
+	if len(p.AppID) != 0 {
+		query = query.Must(elastic.NewTermQuery("app_id", p.AppID))
+	}
+	if len(p.SessionID) != 0 {
+		query = query.Must(elastic.NewTermQuery("session_number", p.SessionID))
+	}
+	// TODO: Print DSL, could remove in the future
+	src, err := query.Source()
+	data, err := json.Marshal(src)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(data))
+	// TODO: hardcode index name here, replace with real later
+	// TODO: the size of return record should be limited
+	searchResult, err := client.Search().
+		Index("log").        // search in index "log"
+		Query(query).        // specify the query
+		Sort("date", true).  // sort by "user" field, ascending
+		From(0).Size(10000). // take documents 0-10000
+		Pretty(true).        // pretty print request and response JSON
+		Do()                 // execute
+	if err != nil {
+		// Handle error
+		panic(err)
+	}
+
+	// searchResult is of type SearchResult and returns hits, suggestions,
+	// and all kinds of other information from Elasticsearch.
+	// fmt.Printf("Query took %d milliseconds\n", searchResult.TookInMillis)
+
+	// TotalHits is another convenience function that works even when something goes wrong.
+	// fmt.Printf("Found a total of %d tweets\n", searchResult.TotalHits())
+	return searchResult, nil
+}
+
+func (p *Puller) GenerateResult(sr *elastic.SearchResult) (bytes.Buffer, int64, error) {
+	// Each is a convenience function that iterates over hits in a search result.
+	// It makes sure you don't need to check for nil values in the response.
+	// However, it ignores errors in serialization. If you want full control
+	// over iterating the hits, see below.
+	var ttyp Log
+	var buffer bytes.Buffer
+	for _, item := range sr.Each(reflect.TypeOf(ttyp)) {
+		if t, ok := item.(Log); ok {
+			s := fmt.Sprintf("%s %s %s %s\n", t.Timestamp, t.Program, t.Host, t.Message)
+			buffer.WriteString(s)
+		}
+	}
+	return buffer, sr.TotalHits(), nil
+}
+
 func (er *ESResource) index(c *gin.Context) {
 	c.HTML(200, "index.tmpl", gin.H{})
 }
@@ -64,7 +128,7 @@ func (er *ESResource) logs(c *gin.Context) {
 		panic(err)
 	}
 	result, err := pull.Search()
-	buffer, hits, err := pull.GenerateFile(result)
+	buffer, hits, err := pull.GenerateResult(result)
 
 	b := make([]byte, 16)
 	_, err = rand.Read(b)
@@ -87,7 +151,6 @@ func (er *ESResource) logs(c *gin.Context) {
 		"hits":    hits,
 		"logfile": "http://localhost:8080/static/" + logFile,
 	})
-
 }
 
 func (er *ESResource) search(c *gin.Context) {
@@ -102,7 +165,7 @@ func (er *ESResource) search(c *gin.Context) {
 		panic(err)
 	}
 	result, err := pull.Search()
-	buffer, hits, err := pull.GenerateFile(result)
+	buffer, hits, err := pull.GenerateResult(result)
 	b := make([]byte, 16)
 	_, err = rand.Read(b)
 	if err != nil {
