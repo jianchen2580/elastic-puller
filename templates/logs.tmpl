@@ -1,0 +1,16 @@
+{{ define "logs.tmpl" }}
+
+<html> 
+<head> 
+    <title>"Welcome to ES Puller"</title>
+    <link rel="stylesheet" type="text/css" href="http://meyerweb.com/eric/tools/css/reset/reset.css"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script> 
+    <script src="http://malsup.github.com/jquery.form.js"></script> 
+    </head>
+    <body>
+    <h1>{{ .hits }} hits</h1>
+    <div>
+      <a href="/static/rt.log" download="proposed_file_name">Download Log</a>
+    </div>
+</html>
+{{ end }}

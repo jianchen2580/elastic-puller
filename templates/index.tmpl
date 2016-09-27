@@ -1,8 +1,5 @@
-package main
+{{ define "index.tmpl" }}
 
-import "html/template"
-
-var html = template.Must(template.New("ES_Puller").Parse(`
 <html> 
 <head> 
     <title>"Welcome to ES Puller"</title>
@@ -20,13 +17,13 @@ var html = template.Must(template.New("ES_Puller").Parse(`
 		</div>
     <div id="messages"></div>
     <form id="prism" action="/search" method="get"> 
-		<input type="hidden" name="index" value="prism">
-    Date Start: <input id="date_gte" name="date_gte" value=""></input> 
-    Date End: <input id="date_lte" name="date_lte"></input> 
-    Account ID: <input id="account_id" name="account_id" value=""></input> 
-    App ID: <input id="app_id" name="app_id" value=""></input> 
-    Session ID: <input id="session_id" name="session_id" value=""></input> 
-    <input type="submit" value="Submit" /> 
+	  <input type="hidden" name="index" value="prism">
+      Date Start: <input id="date_gte" name="date_gte" value=""></input> 
+      Date End: <input id="date_lte" name="date_lte"></input> 
+      Account ID: <input id="account_id" name="account_id" value=""></input> 
+      App ID: <input id="app_id" name="app_id" value=""></input> 
+      Session ID: <input id="session_id" name="session_id" value=""></input> 
+      <input type="submit" value="Submit" /> 
     </form>
 
     <form id="vcs" action="/search" method="get"> 
@@ -38,6 +35,9 @@ var html = template.Must(template.New("ES_Puller").Parse(`
     Session ID: <input id="session_id" name="session_id" value=""></input> 
     <input type="submit" value="Submit" /> 
     </form>
+		<div>
+		<a href="/static/rt.log" download="proposed_file_name">Download Log</a>
+		</div>
 
     </body>
 		<script>
@@ -50,4 +50,4 @@ var html = template.Must(template.New("ES_Puller").Parse(`
 		});
 		</script>
 </html>
-`))
+{{ end }}

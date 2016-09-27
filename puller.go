@@ -99,7 +99,7 @@ func (p *Puller) Search() (*elastic.SearchResult, error) {
 	return searchResult, nil
 }
 
-func (p *Puller) GenerateFile(sr *elastic.SearchResult) (bytes.Buffer, error) {
+func (p *Puller) GenerateFile(sr *elastic.SearchResult) (bytes.Buffer, int64, error) {
 	tmpfile, err := ioutil.TempFile("", "example")
 	fmt.Println("filename is:", tmpfile.Name)
 	if err != nil {
@@ -114,5 +114,5 @@ func (p *Puller) GenerateFile(sr *elastic.SearchResult) (bytes.Buffer, error) {
 			buffer.WriteString(s)
 		}
 	}
-	return buffer, nil
+	return buffer, sr.TotalHits(), nil
 }

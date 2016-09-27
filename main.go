@@ -8,7 +8,8 @@ import (
 
 func main() {
 	r := gin.Default()
-	r.SetHTMLTemplate(html)
+	//r.SetHTMLTemplate(html)
+	r.LoadHTMLGlob("templates/*")
 	r.Static("/static", "./static")
 	r.GET("/index", index)
 	r.GET("/search", search)
@@ -17,7 +18,7 @@ func main() {
 }
 
 func index(c *gin.Context) {
-	c.HTML(200, "ES_Puller", gin.H{})
+	c.HTML(200, "index.tmpl", gin.H{})
 }
 
 func logs(c *gin.Context) {
@@ -33,8 +34,11 @@ func logs(c *gin.Context) {
 		panic(err)
 	}
 	result, err := pull.Search()
-	buffer, err := pull.GenerateFile(result)
-	c.String(200, buffer.String())
+	buffer, hits, err := pull.GenerateFile(result)
+	c.HTML(200, "logs.tmpl", gin.H{
+		"hits":   hits,
+		"buffer": buffer,
+	})
 }
 
 func search(c *gin.Context) {
@@ -44,12 +48,14 @@ func search(c *gin.Context) {
 	accountID := c.Query("account_id")
 	appID := c.Query("app_id")
 	sessionID := c.Query("session_id")
-	//fmt.Println("###", date_gte, date_lte)
 	pull, err := NewPuller(index, dateGte, dateLte, accountID, sessionID, appID)
 	if err != nil {
 		panic(err)
 	}
 	result, err := pull.Search()
-	buffer, err := pull.GenerateFile(result)
-	c.String(200, buffer.String())
+	buffer, hits, err := pull.GenerateFile(result)
+	c.HTML(200, "logs.tmpl", gin.H{
+		"hits":   hits,
+		"buffer": buffer,
+	})
 }
