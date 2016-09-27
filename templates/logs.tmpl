@@ -10,7 +10,7 @@
     <body>
     <h1>{{ .hits }} hits</h1>
     <div>
-      <a href="/static/rt.log" download="proposed_file_name">Download Log</a>
+      <a href="/static/{{ .logfile }}" download="{{ .logfile }}">Download</a>
     </div>
 </html>
 {{ end }}

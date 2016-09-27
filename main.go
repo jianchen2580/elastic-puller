@@ -1,9 +1,12 @@
 package main
 
 import (
-	//"fmt"
+	"crypto/rand"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"os"
 	//"net/http"
+	//"io/ioutil"
 )
 
 func main() {
@@ -35,10 +38,29 @@ func logs(c *gin.Context) {
 	}
 	result, err := pull.Search()
 	buffer, hits, err := pull.GenerateFile(result)
-	c.HTML(200, "logs.tmpl", gin.H{
-		"hits":   hits,
-		"buffer": buffer,
+
+	b := make([]byte, 16)
+	_, err = rand.Read(b)
+	if err != nil {
+		panic(err)
+	}
+	uuid := fmt.Sprintf("%X%X%X%X", b[0:4], b[4:8], b[8:12], b[10:])
+	logFile := uuid + ".log"
+	if err != nil {
+		panic(err)
+	}
+	fo, err := os.Create("./static/" + logFile)
+	defer func() {
+		if err := fo.Close(); err != nil {
+			panic(err)
+		}
+	}()
+	buffer.WriteTo(fo)
+	c.JSON(200, gin.H{
+		"hits":    hits,
+		"logfile": "http://localhost:8080/static/" + logFile,
 	})
+
 }
 
 func search(c *gin.Context) {
@@ -54,8 +76,25 @@ func search(c *gin.Context) {
 	}
 	result, err := pull.Search()
 	buffer, hits, err := pull.GenerateFile(result)
+	b := make([]byte, 16)
+	_, err = rand.Read(b)
+	if err != nil {
+		panic(err)
+	}
+	uuid := fmt.Sprintf("%X%X%X%X", b[0:4], b[4:8], b[8:12], b[10:])
+	logFile := uuid + ".log"
+	if err != nil {
+		panic(err)
+	}
+	fo, err := os.Create("./static/" + logFile)
+	defer func() {
+		if err := fo.Close(); err != nil {
+			panic(err)
+		}
+	}()
+	buffer.WriteTo(fo)
 	c.HTML(200, "logs.tmpl", gin.H{
-		"hits":   hits,
-		"buffer": buffer,
+		"hits":    hits,
+		"logfile": logFile,
 	})
 }
