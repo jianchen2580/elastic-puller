@@ -21,6 +21,7 @@ type Log struct {
 
 type Puller struct {
 	ESClient  *elastic.Client
+	index     string
 	TimeStart string
 	TimeEnd   string
 	SessionID string
@@ -28,7 +29,7 @@ type Puller struct {
 	AppID     string
 }
 
-func NewPuller(start string, end string, accountID string, sessionID string, appID string) (*Puller, error) {
+func NewPuller(index string, start string, end string, accountID string, sessionID string, appID string) (*Puller, error) {
 	client, err := elastic.NewClient()
 	if err != nil {
 		panic(err)
