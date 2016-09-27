@@ -11,9 +11,9 @@ func (puller *ESService) Run() error {
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/static", "./static")
-	r.GET("/index", index)
-	r.GET("/search", search)
-	r.GET("/users/:accountID/logs", logs)
+	r.GET("/index", esResource.index)
+	r.GET("/search", esResource.search)
+	r.GET("/users/:accountID/logs", esResource.logs)
 	r.Run(":8080")
 	return nil
 }
