@@ -1,12 +1,11 @@
 package main
 
 import (
-	"es-puller/service"
 	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jianchen2580/es-puller/service"
+	"github.com/jianchen2580/elastic-puller/service"
 
 	"github.com/codegangsta/cli"
 )
