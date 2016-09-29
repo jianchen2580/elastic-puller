@@ -51,6 +51,7 @@ func NewPuller(index string, start string, end string, accountID string, session
 }
 
 func (p *Puller) Search() (*elastic.SearchResult, error) {
+	fmt.Println("###########", p.TimeStart, p.TimeEnd, p.SessionID)
 	client := p.ESClient
 	query := elastic.NewBoolQuery()
 	query = query.Must(elastic.NewRangeQuery("@timestamp").

@@ -11,6 +11,7 @@ func (puller *ESService) Run() error {
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/static", "./static")
+	r.Static("/assert", "./assert")
 	r.GET("/index", esResource.index)
 	r.GET("/search", esResource.search)
 	r.GET("/users/:accountID/logs", esResource.logs)

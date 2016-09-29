@@ -2,43 +2,47 @@
 
 <html> 
 <head> 
-    <title>"Welcome to ES Puller"</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+       <!-- Custom styles for this template -->
+    <link href="/assert/elastic.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="http://meyerweb.com/eric/tools/css/reset/reset.css"/>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="http://malsup.github.com/jquery.form.js"></script> 
-    </head>
-    <body>
-    <h1>Welcome to ES Puller</h1>
-		<div id="index-select">
-		<select id="index">
-		<option value="prism" selected="selected">logstash-us</option>
-		<option value="vcs">us-vcs</option>
-		</select>
-		</div>
-    <div id="messages"></div>
-    <form id="prism" action="/search" method="get"> 
-	  <input type="hidden" name="index" value="prism">
-      Date Start: <input id="date_gte" name="date_gte" value=""></input> 
-      Date End: <input id="date_lte" name="date_lte"></input> 
-      Account ID: <input id="account_id" name="account_id" value=""></input> 
-      App ID: <input id="app_id" name="app_id" value=""></input> 
-      Session ID: <input id="session_id" name="session_id" value=""></input> 
-      <input type="submit" value="Submit" /> 
-    </form>
+</head>
+<body>
+    <div class="container">
+      <form class="form-query" action="/search" method="GET">
+        <h2 class="form-query-heading">Welcome to ES Puller</h2>
+        <label for="index" class="sr-only">Index</label>
+        <select id="index">
+        <option value="prism" selected="selected">logstash-us</option>
+        <option value="vcs">us-vcs</option>
+        </select>
+        <label for="date_gte" class="sr-only">Time Start</label>
+        <input type="text" name="date_gte" id="date_gte" class="form-control" placeholder="Time Start" required autofocus>
+        <label for="date_lte" class="sr-only">Time End</label>
+        <input type="text" name="date_lte" id="date_lte" class="form-control" placeholder="Time End" required autofocus>
+        <label for="date_lte" class="sr-only">Time End</label>
+        <input type="text" name="account_id" id="account_id" class="form-control" placeholder="Account ID" autofocus>
+        <label for="date_lte" class="sr-only">Time End</label>
+        <input type="text" name="app_id" id="app_id" class="form-control" placeholder="App ID" autofocus>
+        <label for="date_lte" class="sr-only">Time End</label>
+        <input type="text" name="session_id" id="session_id" class="form-control" placeholder="Session ID" autofocus>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Search</button>
+      </form>
 
-    <form id="vcs" action="/search" method="get"> 
-		<input type="hidden" name="index" value="vcs">
-    Date Start: <input id="date_gte" name="date_gte" value=""></input> 
-    Date End: <input id="date_lte" name="date_lte"></input> 
-    Account ID: <input id="account_id" name="account_id" value=""></input> 
-    App ID: <input id="app_id" name="app_id" value=""></input> 
-    Session ID: <input id="session_id" name="session_id" value=""></input> 
-    <input type="submit" value="Submit" /> 
-    </form>
-		<div>
-		<a href="/static/rt.log" download="proposed_file_name">Download Log</a>
-		</div>
-
+    </div> <!-- /container -->
     </body>
 		<script>
 		$(document).ready(function(){
